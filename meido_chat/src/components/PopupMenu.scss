@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Reggae+One&display=swap');
+
+
+.popup-menu-container {
+  position: absolute;
+  top: 38%;
+  left: 44%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+
+.popup-menu {
+  position: absolute;
+  z-index: 2;
+  font-size: 16pt;
+  font-weight: bolder;
+  //margin-left: 45%;
+  min-width: 32rem;
+  width: auto;
+  text-align: left;
+  font-family: 'DotGothic16', sans-serif;
+  margin-top: 0.5rem;
+  background-color: #fcfcfc;
+  padding: 1rem;
+  border-radius: 2rem;
+  transform: scale(0);
+  transform-origin: top left;
+  transition: transform 0.2s;
+
+  &.shown {
+    transform: scale(1);
+    padding-left: 2rem;
+  }
+}
+

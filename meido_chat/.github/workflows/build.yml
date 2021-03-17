@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: build image
+        env:
+          SHA: ${{ github.sha }}
+          SOCKET_URL: ${{secrets.socket_url}}
+          LIFF_ID: ${{secrets.liff_id}}
+        run: |
+          echo $SHA
+          docker build . --tag notchman/meido-chat:$SHA --build-arg socket_url=$SOCKET_URL --build-arg liff_id=$LIFF_ID
+      - name: docker login
+        env:
+          DOCKERHUB_USER: ${{ secrets.dockerhub_user }}
+          DOCKERHUB_PASS: ${{ secrets.dockerhub_password }}
+        run: docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+      - name: push image
+        env:
+          SHA: ${{ github.sha }}
+        run: docker push notchman/meido-chat:$SHA
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@master
+      - name: deploy image
+        env:
+          GCP_KEY: ${{ secrets.gcp_key }}
+          SHA: ${{ github.sha }}
+        run: |
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" > google-cloud-sdk.list
+          sudo cp google-cloud-sdk.list /etc/apt/sources.list.d
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg > apt-key.gpg
+          sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add apt-key.gpg
+          sudo apt-get update
+          sudo apt-get install google-cloud-sdk kubectl
+          echo $GCP_KEY > gcp_key.json
+          gcloud auth activate-service-account --project=sapient-depot-302603 --key-file=gcp_key.json
+          gcloud container clusters get-credentials meido --zone us-west1-a
+          echo $SHA
+          sed -i -e "s/<FRONTIMAGE>/notchman\/meido-chat:$SHA/" ./kubernetes/deploy.yaml
+          kubectl apply -f ./kubernetes/deploy.yaml
+          kubectl apply -f ./kubernetes/service.yaml
+          kubectl get pods -o yaml

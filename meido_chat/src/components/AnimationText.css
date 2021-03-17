@@ -1,0 +1,146 @@
+
+.sample01 {
+    margin: 0 auto 40px;
+    width: 100%;
+    font-size: 28px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.sample01 p {
+    margin: 0;
+    display: inline-block;
+    padding-left: 100%;
+    white-space: pre;
+    color: #F90;
+
+    line-height: 1em;
+    animation: scrollSample01 5s linear infinite;
+}
+
+@keyframes scrollSample01 {
+    0% {
+        transform: translateX(0)
+    }
+    100% {
+        transform: translateX(-100%)
+    }
+}
+
+/*.text{*/
+/*    font-size:2em;*/
+/*    color:#F90;*/
+/*    margin : 0 auto 2.5rem;*/
+/*    overflow : hidden;*/
+
+/*    animation: flowing 15s linear infinite;*/
+/*    transform: translateX(100%);!*初期位置*!*/
+/*}*/
+
+
+.text p {
+    display: inline-block;
+    padding-left: 100%;
+    white-space: pre;
+    line-height: 1.5em;
+    animation: scrollSample01 5s linear infinite;
+}
+
+.sample02 ul li:nth-child(1) {
+    color: #F90;
+    /*white-space : pre;*/
+
+}
+
+.sample02 ul li:nth-child(2) {
+    /*white-space : pre;*/
+    color: #F90;
+
+}
+
+.sample02 ul li:nth-child(3) {
+    /*white-space : pre;*/
+
+}
+
+.sample02 ul li:last-child {
+    color: #F90;
+    margin: 0;
+}
+
+.sample02 {
+    width: 100%;
+    background: #13131399;
+z-index: 8;
+    font-size: 6rem;
+    text-align: center;
+    overflow: hidden;
+    white-space: pre;
+    font-weight: bold;
+    font-style: italic;
+}
+
+
+@keyframes flash {
+    0%,35%,60%,100%{
+        opacity: 0;
+    }
+
+    25%{
+        opacity: 1;
+        color:#7fff00;
+    }
+
+    50%{
+        opacity: 1;
+        color:#0091EA;
+    }
+
+    75%{
+        opacity: 1;
+        color:#ff1493;
+    }
+}
+
+.sample02 ul {
+    margin: 0;
+    color: #FF9900;
+    display: inline-block;
+    padding-left: 100%;
+    /*padding-right: 100%;*/
+    animation: scrollSample02 10s linear infinite;
+}
+
+.sample02 ul li {
+    display: inline;
+    color: #F90;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+    animation: flash 1s linear infinite;
+
+}
+
+
+@keyframes scrollSample02 {
+    from {
+        transform: translate(0%);
+    }
+
+    100%, to {
+        transform: translate(-100%);
+    }
+
+}
+
+@keyframes returnScrollSample02 {
+    from {
+        transform: translate(0%);
+    }
+
+}
+
+@keyframes flowing {
+    100% {
+        transform: translateX(-100%);
+    }
+}

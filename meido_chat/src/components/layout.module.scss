@@ -1,0 +1,36 @@
+aaaaa.container {
+  //margin: 3rem auto 6rem;
+  color: #131313;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  font-size: 1rem;
+  color: #f3f3f3;
+  background-color: #2171B7;
+  flex-direction: row;
+  align-items: center;
+}
+
+.headerImage {
+  width: 4.2rem;
+  height: 4.2rem;
+}
+
+.headerHomeImage {
+  width: 5rem;
+  height: 5rem;
+  padding:5pt;
+  border-radius: 50%; /* 角丸半径を50%にする(=円形にする) */
+  background-position: center center;
+  margin-right: 16pt;
+  display: inline-block; /* 複数の画像を横に並べたい場合 */
+
+}
+
+.backToHome {
+  margin: 3rem 0 0;
+}
+
+
