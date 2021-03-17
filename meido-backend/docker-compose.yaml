@@ -1,0 +1,36 @@
+version: "3.9"
+services:
+  meido-api:
+    build: 
+      context: ./meido-api
+      args:
+        - flask_url:http://flask:9000/message_twitter_3_fast
+    working_dir: /go/src
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - flask
+    environment:
+      - "REDIS_HOST=redis:6379"
+      # ローカルのテストの時だけ有効にする
+      - "REDIS_PATH=redis:6379"
+      - "PORT=8080"
+      # - "FLASK_URL=http://flask:9000/message"
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    command: redis-server
+  flask: 
+     build: ./flask
+     ports: 
+      - "9000:9000"
+  # worker:
+  #   build: ./worker
+  #   depends_on:
+  #     - redis
+  #   environment:
+  #     - "REDIS_HOST=redis:6379"
+

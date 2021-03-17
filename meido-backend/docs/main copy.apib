@@ -1,0 +1,225 @@
+# 作る予定のAPI
+
+FORMAT: 1A
+HOST: http://localhost
+
+# Meido API
+
+メイドさんのためのAPI。それ以上もそれ以下もない。
+基本的にはWebアプリ用。しかし、Unityからも良い感じに呼んだり良い感じの値を取ってくることでメイドの表現に幅が生まれるかもしれない。  
+--- 
+/wsと書かれているものは全てSocket通信。リクエストにアクションタイプを明記すること。
+/ws以外は通常のhttpリクエストに対応したAPIを用意する予定。GETの場合は/ws:以下の内容をactionに明記して
+```
+{
+    "action:" <書かれている内容>
+}
+```
+とする。
+
+# Group ドア関連
+
+## ドアの開閉状況を投げる [POST /ws: POST_DOOR]
+
++ Request (application/json)
+    + Attributes
+        + action: POST_DOOR (string,required) - アクションタイプ
+ 
++ Response 200 (application/json)
+    + Attributes
+        + action: POST_DOOR (string) - アクションタイプ
+        + status: SUCCESS (string) - 登録結果
+        + error: false (boolean) - サーバーの生死
+
+## ドアの開閉状況を投げる [POST /ws: GET_DOOR]
+
++ Request (application/json)
+    + Attributes
+        + action: GET_DOOR (string,required) - アクションタイプ
+ 
++ Response 200 (application/json)
+    + Attributes
+        + action: GET_DOOR (string) - アクションタイプ
+        + message: OPEN (string) - ドアの状態を返す
+
+# Group ユーザー関連
+
+## 認証されたユーザーの情報を通知する [POST /ws:POST_ACCEPT_USER]
+
++ Request (application/json)
+    + Attributes
+        + action:POST_ACCEPT_USER (string,required) - アクションタイプの指定
+        + uuid: TTTTTTTT-TTTT-1TTT-sSSS-AAAAAAAAAAAA (string,required) - 一意に定まれば何でも良き
+        + name: notch_man (string,required) - 認証されたユーザー名が分かると望ましい。分からないときは空文字か適当な名前を入れて貰うと助かります（nullチェック怠いので）
++ Response (application/json)
+    + Attributes
+        + action:POST_ACCEPT_USER (string,required) - アクションタイプを返す
+        + status: OK - 実行結果を返す。OKかログが返る
+        + error: false - フラグでエラー判定。trueの場合はstatusにログが入ってます
+
+## 認証拒絶されたユーザーの情報を通知する [POST /ws:POST_DENIED_USER]
+
++ Request (application/json)
+    + Attributes
+        + action:POST_DENIED_USER (string,required) - アクションタイプの指定
+        + uuid: TTTTTTTT-TTTT-1TTT-sSSS-AAAAAAAAAAAA (string,required) - 一意に定まれば何でも良き
+        + name: 不審者X (string,required) - 拒否されたらユーザー名分からんよな。かっこいい名前送ってちょーだい！
+
++ Response (application/json)
+    + Attributes
+        + action:POST_DENIED_USER (string,required) - アクションタイプを返す
+        + status: OK - 実行結果を返す。OKかログが返る
+        + error: false - フラグでエラー判定。trueの場合はstatusにログが入ってます
+
+## 認証されたユーザーの数を取得する [GET /ws:ACCEPT_USER]
+
++ Request (application/json)
+    + Attributes
+        + action:ACCEPT_USER (string,required) - アクションタイプの指定
+
++ Response 200 (application/json)
+    + Attributes
+        + action:ACCEPT_USER (string,required) - アクションタイプの指定
+        + status: 'SUCCESS' (string) - APIの実行結果
+        + count: 10 (number) - 認証されたユーザー数を格納する
+
+## リジェクトされたユーザーの数を取得する [GET /ws:DENIED_USER]
+
++ Request (application/json)
+    + Attributes
+        + action: DENIED_USER (string,required)
+
++ Response 200 (application/json)
+    + Attributes
+        + action: DENIED_USER (string)
+        + status: 'SUCCESS' (string) - APIの実行結果
+        + count: 10 (number) - 認証されたユーザー数を格納する
+
+# Group ログ関連
+
+## エラーログの一覧を取得する [GET /ws:ERROR_LOGS]
+
++ Request
+    + Attributes
+        + action: ERROR_LOGS (string,required) - アクションタイプの指定
+
++ Response 200 (application/json)
+    + Attributes
+        + logs (array[object])
+            + (object)
+                + camera_name: 'カメラ1' (string) - カメラ名
+                + timestamp: '2021-01-10T13:50:40+09:00' (string) - ISO8601準拠のタイムスタンプ
+                + imageUrl: 'http://example.com/picture/camera.jpg' (string) - 画像のアクセスリンク
+
+
+## エラーログの数を取得する [GET /ws:LOG_COUNT]
+
++ Request (application/json)
+    + Attributes
+        + action: LOG_COUNT (string,required) - アクションタイプの指定
+
++ Response 200 (application/json)
+    + Attributes
+        + count: 10 (number) - エラーログの数
+
+# Group 謎機能
+
+## メイドちゃんにメッセージを投げる [POST /ws: MEIDO_VOTE]
+
++ Request (application/json)
+    + Attributes
+        + action: MEIDO_VOTE (string,required) - アクションタイプ
+        + message: 'にゃ～ん' (string,required) - 推しへの愛のメッセージを投下
+        
++ Response 200(application/json)
+    + Attributes
+        + action: MEIDO_VOTE (string) - アクションタイプ
+        + message: ありがとなす (string) - 推しからの愛のメッセージ
+        + status: OK (string) - 推しの状態
+        + error: false (boolean) - 処理結果がエラーか否か
+
+## メイドちゃん応援中をアピール [POST /ws: MEIDO_FUN]
+
+これはConneting Usersのカウントのために定期的に回して欲しいAPIです。サーバー上では5分以上接続が無かったら遮断されたと見なします。
+
++ Request (application/json)
+    + Attributes
+        + action: MEIDO_FUN (string,required) - アクションタイプ
+        + uid: hogehoge (string,required) - Liffで取得したUIDまたは一意のキー
+
++ Response 200 (application/json)
+    + Attributes
+        + action: MEIDO_FUN (string) - アクションタイプ
+        + message: ありがとなす！ (string) - 推しからの応援メッセージ
+
+## APIに接続中のユーザーをカウント [GET /ws: MEIDO_COUNT]
+
++ Request (application/json)
+    + Attributes
+        + action: MEIDO_COUNT (string,required) - アクションタイプ
+
++ Response 200 (application/json)
+    + Attributes
+        + action: MEIDO_COUNT (string) - アクションタイプ
+        + count: 10 (number) - 接続中のユーザー数
+
+
+## メイドに送られた推しメッセージを取得:deprecated  [POST /ws: POST_MESSAGE] 
+
+注意：このAPIを叩くと以前に投稿された推しへのメッセージは全て無くなります。
+あとこれを叩くと接続中の全ユーザーにメッセージが流れます。
+
++ Request (application/json)
+    + Attributes
+        + action: POST_MESSAGE (string,required) - アクションタイプの指定
+        + message: 愛してるよ～、にゃ～ん (string,required) - 推しへの愛のメッセージ
+
++ Response 200 (application/json)
+    + Attributes
+        + action: POST_MESSAGE (string) - アクションタイプ
+        + message (string) - 推しへの愛のメッセージ
+
+## メイドに送られた推しメッセージを取得:obsoleted [GET /ws: GET_MESSAGE] 
+
+注意：このAPIを叩くと以前に投稿された推しへのメッセージは全て無くなります。
+このAPIは実装されていません
+
++ Request (application/json)
+    + Attributes
+        + action: GET_MESSAGE (string,required) - アクションタイプの指定
+
++ Response 200 (application/json)
+    + Attributes
+        + action: GET_MESSAGE (string) - アクションタイプ
+        + messages (array[string])
+            + ありがとなす (string) - 推しからのメッセージ
+            + ありがとなす (string) - 推しからのメッセージ
+            + ありがとなす (string) - 推しからのメッセージ
+            + ありがとなす (string) - 推しからのメッセージ
+
+## メイドちゃんのステータスを返す [GET /ws: MEIDO_STATUS]
+
++ Request (application/json)
+    + Attributes
+        + action: MEIDO_STATUS (string,required) - アクションタイプを指定
+
++ Response　(application/json)
+    + Attributes
+        + action: MEIDO_STATUS (string) - アクションタイプ
+        + status: Tired (string) - メイドちゃんの状態
+
+# Group システム関連
+
+## システムの状態を返す [GET /ws: SYSTEM_STATUS]
+
++ Request (application/json)
+    + Attributes
+        + action: SYSTEM_STATUS (string,required) - アクションタイプを指定
+        
++ Response (application/json)
+    + Attributes
+        + action: SYSTEM_STATUS (string) - アクションタイプ
+        + status: Avalilable (string) - サーバーのステータスメッセージを格納
+        + error: false (boolean) - サーバーにエラーが発生している場合はフラグが立つ。
+
+
